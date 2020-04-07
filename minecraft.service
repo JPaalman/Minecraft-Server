@@ -1,0 +1,13 @@
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+Type=oneshot
+KillMode=none
+
+ExecStart=/srv/minecraft/minecraft.bash start
+ExecStop=/srv/minecraft/minecraft.bash stop
+
+[Install]
+WantedBy=multi-user.target
