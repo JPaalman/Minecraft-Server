@@ -44,15 +44,17 @@ function console() {
 
 # Stop the server
 function stop() {
-  screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_MESSAGE}\n""stop\n"
-  while status > /dev/null; do sleep 1; done
-  $LOGGING && printf "\n\n" >> "$WORLDNAME".log
+  status > /dev/null && {
+    screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_MESSAGE}\n""stop\n"
+    while status > /dev/null; do sleep 1; done
+    $LOGGING && printf "\n\n" >> "$WORLDNAME".log
+  }
 }
 
 # Make a backup of the world
 function backup() {
-  [ -d "$BACKUP_DIRECTORY" ] || mkdir "$BACKUP_DIRECTORY"
-  status > /dev/null && stop "$BACKUP_MESSAGE"
+  mkdir -p "$BACKUP_DIRECTORY"
+  status && stop "$BACKUP_MESSAGE"
   local DATE=$(date +%Y_%m_%d_%H%M)
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$DATE".zip "$WORLDNAME"
   $AUTOCLEAN && clean
@@ -60,9 +62,9 @@ function backup() {
 
 # Clean old backups
 function clean() {
-  find "$BACKUP_DIRECTORY"/"$WORLDNAME"* | \
-  sort -r | \
-  cut -d $'\n' -f $((BACKUP_AMOUNT + 1))- | \
+  find "$BACKUP_DIRECTORY"/"$WORLDNAME"* |
+  sort -r |
+  cut -d $'\n' -f $((BACKUP_AMOUNT + 1))- |
   xargs rm
 }
 
