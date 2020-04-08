@@ -8,7 +8,7 @@ KillMode=none
 RemainOnExit=true
 
 ExecStart=/srv/minecraft/minecraft.bash start
-ExecStop=/srv/minecraft/minecraft.bash stop
+ExecStop=/srv/minecraft/minecraft.bash status && /srv/minecraft/minecraft.bash stop
 
 [Install]
 WantedBy=multi-user.target
