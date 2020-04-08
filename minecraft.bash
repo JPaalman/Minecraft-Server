@@ -2,8 +2,8 @@
 
 # ---------------- Settings ----------------
 
-# Paths
-WORLDNAME='matigcraft'
+# Paths (relative to script directory)
+WORLDNAME='matigcraft'  # should be the same as level-name in server.properties
 BACKUP_DIRECTORY='backup'
 
 # Messages
@@ -54,7 +54,7 @@ function backup() {
   [ -d "$BACKUP_DIRECTORY" ] || mkdir "$BACKUP_DIRECTORY"
   status > /dev/null && stop "$BACKUP_MESSAGE"
   local DATE=$(date +%Y_%m_%d_%H%M)
-  zip -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$DATE".zip "$WORLDNAME"
+  zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$DATE".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
 

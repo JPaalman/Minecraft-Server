@@ -8,10 +8,13 @@ URL=''
 # where the server should be installed
 SERVER_DIRECTORY='/srv/minecraft'
 
+# which version of Java should be installed
+JRE_VERSION=14
+
 # ---------------- Setup ----------------
 
-# update and install the required packages
-sudo apt install screen openjdk-11-jre-headless || exit
+# install Java
+sudo apt install screen openjdk-"$JRE_VERSION"-jre-headless || exit
 
 # add a user for the minecraft server
 sudo adduser --system --home "$SERVER_DIRECTORY" --group minecraft || exit

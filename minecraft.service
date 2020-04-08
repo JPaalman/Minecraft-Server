@@ -3,8 +3,9 @@ Description=Minecraft Server
 After=network.target
 
 [Service]
-Type=oneshot
+Type=simple
 KillMode=none
+RemainOnExit=true
 
 ExecStart=/srv/minecraft/minecraft.bash start
 ExecStop=/srv/minecraft/minecraft.bash stop
