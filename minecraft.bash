@@ -1,66 +1,69 @@
 #!/bin/bash
 
-# ---------------- Settings ----------------
+# usage: [path_to_script]/minecraft.bash [functions_to_run]
+# example: /srv/minecraft/minecraft.bash start console
 
-# Paths (relative to script directory)
-WORLDNAME='matigcraft'  # should be the same as level-name in server.properties
+# ---------------- settings ----------------
+
+# paths (relative to script directory)
+WORLDNAME='matigcraft' # should be the same as level-name in server.properties
 BACKUP_DIRECTORY='backup'
 
-# Messages
+# kick messages
 STOP_MESSAGE='The server is shutting down for maintenance'
 BACKUP_MESSAGE='The server is making a backup, and will be back online shortly'
 
-# Log all screen content to $WORLDNAME.log
-LOGGING=true
-
-# How many backups to keep when cleaning
-BACKUP_AMOUNT=28
-
-# Clean automatically after a backup
-AUTOCLEAN=true
-
-# Which JVM arguments to use when starting the server
+# JVM arguments to use when starting the server
 JVM_ARGUMENTS='-Xms6G -Xmx6G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC'
 
-# ---------------- Functions ----------------
+# amount of backups to keep when cleaning
+BACKUP_AMOUNT=14
 
-# Start the server inside a screen session
-function start() {
-  $LOGGING && date >> "$WORLDNAME".log
-  screen $($LOGGING && echo -L -Logfile "$WORLDNAME".log) -DmS "$WORLDNAME" java $JVM_ARGUMENTS -jar server.jar nogui &
-}
+# clean automatically after a backup
+AUTOCLEAN=true
 
-# Check if the server is running
+# log all screen content to $WORLDNAME.log
+LOGGING=true
+
+# ---------------- functions ----------------
+
+# check if the server is running
 function status() {
   screen -ls | grep -q -w "$WORLDNAME" \
   && echo $WORLDNAME is running && return 0 \
   || echo $WORLDNAME is not running && return 1
 }
 
-# Open the server console
-function console() {
-  screen -d -r "$WORLDNAME"
+# if not running, start the server in the background
+function start() {
+  status > /dev/null || {
+    $LOGGING && printf "\n\n" >> "$WORLDNAME".log && date >> "$WORLDNAME".log
+    screen $($LOGGING && echo -L -Logfile "$WORLDNAME".log) -DmS "$WORLDNAME" java $JVM_ARGUMENTS -jar server.jar nogui &
+  }
 }
 
-# Stop the server
+# if running, stop the server and wait
 function stop() {
   status > /dev/null && {
     screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_MESSAGE}\n""stop\n"
     while status > /dev/null; do sleep 1; done
-    $LOGGING && printf "\n\n" >> "$WORLDNAME".log
   }
 }
 
-# Make a backup of the world
+# open the server console (CTRL + A, D to close)
+function console() {
+  screen -d -r "$WORLDNAME"
+}
+
+# make a backup of the world
 function backup() {
   mkdir -p "$BACKUP_DIRECTORY"
-  status && stop "$BACKUP_MESSAGE"
-  local DATE=$(date +%Y_%m_%d_%H%M)
-  zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$DATE".zip "$WORLDNAME"
+  stop "$BACKUP_MESSAGE"
+  zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
 
-# Clean old backups
+# clean old backups
 function clean() {
   find "$BACKUP_DIRECTORY"/"$WORLDNAME"* |
   sort -r |
@@ -68,7 +71,7 @@ function clean() {
   xargs rm
 }
 
-# ---------------- Main ----------------
+# ---------------- main ----------------
 
 # make sure to run as user 'minecraft'
 [ "$USER" == minecraft ] || { sudo -u minecraft "$0" "$@"; exit; }
