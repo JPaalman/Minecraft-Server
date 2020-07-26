@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 KillMode=none
-RemainOnExit=true
+RemainAfterExit=true
 
 ExecStart=/srv/minecraft/minecraft.bash start
 ExecStop=/srv/minecraft/minecraft.bash stop
