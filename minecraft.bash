@@ -14,7 +14,7 @@ STOP_MESSAGE='The server is shutting down for maintenance'
 BACKUP_MESSAGE='The server is making a backup, and will be back online shortly'
 
 # JVM arguments to use when starting the server
-JVM_ARGUMENTS='-Xms6G -Xmx6G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC'
+JVM_ARGUMENTS='-Xms4G -Xmx4G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC'
 
 # amount of backups to keep when cleaning
 BACKUP_AMOUNT=14
