@@ -49,7 +49,7 @@ function start {
 function stop {
   status > /dev/null && {
     [ -z "$3" ] || {
-      screen -S "$WORLDNAME" -X stuff "${$2//X/$3}"
+      screen -S "$WORLDNAME" -X stuff "say ${2\n//X/$3}\n"
       sleep $(($3 * 60))
     }
     screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_KICK_MESSAGE}\n""stop\n"
