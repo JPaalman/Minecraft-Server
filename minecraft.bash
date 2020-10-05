@@ -9,22 +9,22 @@
 WORLDNAME="matigcraft" # should be the same as level-name in server.properties
 BACKUP_DIRECTORY="backup"
 
+# log all screen content to $WORLDNAME.log
+LOGGING=true
+
+# JVM arguments to use when starting the server
+JVM_ARGUMENTS="-Xms4G -Xmx4G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC"
+
 # messages
 STOP_KICK_MESSAGE="The server is shutting down for maintenance"
 BACKUP_KICK_MESSAGE="The server is making a backup, and will be back online in a few minutes"
 BACKUP_WARNING_MESSAGE="The server will go offline to make a backup in X minute(s)"
-
-# JVM arguments to use when starting the server
-JVM_ARGUMENTS="-Xms4G -Xmx4G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC"
 
 # amount of backups to keep when cleaning
 BACKUP_AMOUNT=14
 
 # clean automatically after a backup
 AUTOCLEAN=true
-
-# log all screen content to $WORLDNAME.log
-LOGGING=true
 
 # ---------------- functions ----------------
 
@@ -44,11 +44,13 @@ function start {
 }
 
 # if running, stop the server and wait
+# call with text to use as kick message
+# call with additional text and number to display as warning message and warning delay
 function stop {
   status > /dev/null && {
-    [ -z "$2" ] || {
-      screen -S "$WORLDNAME" -X stuff "${$2//X/${3:-"5"}}"
-      sleep $((${3:-"5"} * 60))
+    [ -z "$3" ] || {
+      screen -S "$WORLDNAME" -X stuff "${$2//X/$3}"
+      sleep $(($3 * 60))
     }
     screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_KICK_MESSAGE}\n""stop\n"
     while status > /dev/null; do sleep 1; done
@@ -61,9 +63,10 @@ function console {
 }
 
 # make a backup of the world
+# call with number to use as warning message delay
 function backup {
   mkdir -p "$BACKUP_DIRECTORY"
-  stop "$BACKUP_KICK_MESSAGE" "$([ -z "$1" ] || echo BACKUP_WARNING_MESSAGE)" $([ -z "$1" ] || echo $1)
+  stop "$BACKUP_KICK_MESSAGE" "$BACKUP_WARNING_MESSAGE" $1
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
