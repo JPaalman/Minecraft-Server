@@ -44,9 +44,12 @@ function start {
 }
 
 # if running, stop the server and wait
-# call with text argument to display text as kick message
 function stop {
   status > /dev/null && {
+    [ -z "$2" ] || {
+      screen -S "$WORLDNAME" -X stuff "${$2//X/${3:-"5"}}"
+      sleep $((${3:-"5"} * 60))
+    }
     screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_KICK_MESSAGE}\n""stop\n"
     while status > /dev/null; do sleep 1; done
   }
@@ -58,11 +61,9 @@ function console {
 }
 
 # make a backup of the world
-# call with number argument to display warning message and wait for number in minutes
 function backup {
   mkdir -p "$BACKUP_DIRECTORY"
-  [ -z "$1" ] || screen -S "$WORLDNAME" -X stuff "${BACKUP_WARNING_MESSAGE//X/$1}" && sleep $(($1 * 60))
-  stop "$BACKUP_KICK_MESSAGE"
+  stop "$BACKUP_KICK_MESSAGE" "$([ -z "$2" ] || echo BACKUP_WARNING_MESSAGE)" $([ -z "$2" ] || echo $2)
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
