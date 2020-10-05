@@ -63,7 +63,7 @@ function console {
 # make a backup of the world
 function backup {
   mkdir -p "$BACKUP_DIRECTORY"
-  stop "$BACKUP_KICK_MESSAGE" "$([ -z "$2" ] || echo BACKUP_WARNING_MESSAGE)" $([ -z "$2" ] || echo $2)
+  stop "$BACKUP_KICK_MESSAGE" "$([ -z "$1" ] || echo BACKUP_WARNING_MESSAGE)" $([ -z "$1" ] || echo $1)
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
