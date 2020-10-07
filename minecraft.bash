@@ -70,7 +70,7 @@ function console {
 # call with additional text to use as warning message, defaults to BACKUP_WARNING_MESSAGE
 function backup {
   mkdir -p "$BACKUP_DIRECTORY"
-  stop $1 ${2:-$BACKUP_KICK_MESSAGE} ${3:-$BACKUP_WARNING_MESSAGE}
+  stop $1 "${2:-$BACKUP_KICK_MESSAGE}" "${3:-$BACKUP_WARNING_MESSAGE}"
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
