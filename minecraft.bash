@@ -18,6 +18,7 @@ JVM_ARGUMENTS="-Xms4G -Xmx4G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC"
 # messages
 STOP_KICK_MESSAGE="The server is shutting down for maintenance"
 BACKUP_KICK_MESSAGE="The server is making a backup, and will be back online in a few minutes"
+STOP_WARNING_MESSAGE="The server will go offline for maintenance in X minute(s)"
 BACKUP_WARNING_MESSAGE="The server will go offline to make a backup in X minute(s)"
 
 # amount of backups to keep when cleaning
@@ -44,15 +45,16 @@ function start {
 }
 
 # if running, stop the server and wait
-# call with text to use as kick message
-# call with additional text and number to display as warning message and warning delay
+# call with number to set as warning delay
+# call with additional text to use as kick message, defaults to STOP_KICK_MESSAGE
+# call with additional text to use as warning message, defaults to STOP_WARNING_MESSAGE
 function stop {
   status > /dev/null && {
-    [ -z "$3" ] || {
-      screen -S "$WORLDNAME" -X stuff "say ${2\n//X/$3}\n"
-      sleep $(($3 * 60))
+    [ -z "$1" ] || {
+      screen -S "$WORLDNAME" -X stuff "say ${{3:-$STOP_WARNING_MESSAGE}\n//X/$1}\n"
+      sleep $(($1 * 60))
     }
-    screen -S "$WORLDNAME" -X stuff "kick @a ${1:-$STOP_KICK_MESSAGE}\n""stop\n"
+    screen -S "$WORLDNAME" -X stuff "kick @a ${2:-$STOP_KICK_MESSAGE}\n""stop\n"
     while status > /dev/null; do sleep 1; done
   }
 }
@@ -63,10 +65,12 @@ function console {
 }
 
 # make a backup of the world
-# call with number to use as warning message delay
+# call with number to set as warning delay
+# call with additional text to use as kick message, defaults to BACKUP_KICK_MESSAGE
+# call with additional text to use as warning message, defaults to BACKUP_WARNING_MESSAGE
 function backup {
   mkdir -p "$BACKUP_DIRECTORY"
-  stop "$BACKUP_KICK_MESSAGE" "$BACKUP_WARNING_MESSAGE" $1
+  stop $1 ${2:-$BACKUP_KICK_MESSAGE} ${3:-$BACKUP_WARNING_MESSAGE}
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLDNAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLDNAME"
   $AUTOCLEAN && clean
 }
