@@ -7,7 +7,7 @@
 
 # paths
 BACKUP_DIRECTORY="backup"
-SERVER_NAME="paper-288" # the filename of your server.jar
+SERVER_NAME="paper-288.jar" # the filename of your server.jar
 WORLD_NAME="matigcraft" # level-name in server.properties
 
 # messages
