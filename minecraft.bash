@@ -64,7 +64,7 @@ function console {
 function stop {
   status > /dev/null && {
     [ -z "$1" ] || {
-      screen -S "$WORLD_NAME" -X stuff "say ${{2:-$STOP_WARNING_MESSAGE}\n//X/$1}\n"
+      screen -S "$WORLD_NAME" -X stuff "say ${{2:-$STOP_WARNING_MESSAGE}//X/$1}\n"
       sleep $(($1 * 60))
     }
     screen -S "$WORLD_NAME" -X stuff "kick @a ${3:-$STOP_KICK_MESSAGE}\n""stop\n"
