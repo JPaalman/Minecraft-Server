@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # usage: [path_to_script]/minecraft.bash [functions_to_run]
-# example: /srv/minecraft/minecraft.bash start console
+# example: /srv/minecraft/minecraft.bash stop "backup 10"
 
 # -------------------------------- settings --------------------------------
 
 # paths
 BACKUP_DIRECTORY="backup"
-SERVER_NAME="paper-288.jar" # the filename of your server.jar
+SERVER_NAME="paper-296.jar" # the filename of your server jar
 WORLD_NAME="matigcraft" # level-name in server.properties
 
 # messages
@@ -77,9 +77,9 @@ function stop {
 # call with additional text to use as warning message, defaults to BACKUP_WARNING_MESSAGE
 # call with additional text to use as kick message, defaults to BACKUP_KICK_MESSAGE
 function backup {
+  stop "$1" "${2:-$BACKUP_WARNING_MESSAGE}" "${3:-$BACKUP_KICK_MESSAGE}"
   $ALTERNATIVE_SERVER && convert
   mkdir -p "$BACKUP_DIRECTORY"
-  stop "$1" "${2:-$BACKUP_WARNING_MESSAGE}" "${3:-$BACKUP_KICK_MESSAGE}"
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
   $AUTO_CLEAN && clean
 }
