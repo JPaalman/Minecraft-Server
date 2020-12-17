@@ -7,7 +7,6 @@
 
 # paths
 BACKUP_DIRECTORY="backup"
-SERVER_NAME="paper-296.jar" # the filename of your server jar
 WORLD_NAME="matigcraft" # level-name in server.properties
 
 # messages
@@ -45,7 +44,7 @@ function start {
   status > /dev/null || {
     $LOGGING && {
       printf "\n\n" >> "$WORLD_NAME".log && date >> "$WORLD_NAME".log
-      screen -L -Logfile "$WORLD_NAME".log -DmS "$WORLD_NAME" java $JVM_ARGUMENTS -jar "$SERVER_NAME" nogui &
+      screen -L -Logfile "$WORLD_NAME".log -DmS "$WORLD_NAME" java $JVM_ARGUMENTS -jar server.jar nogui &
       return
     }
     screen -DmS "$WORLD_NAME" java $JVM_ARGUMENTS -jar "$SERVER_NAME" nogui &
@@ -71,6 +70,15 @@ function stop {
     screen -S "$WORLD_NAME" -X stuff "kick @a ${3:-$STOP_KICK_MESSAGE}\n""stop\n"
     while status > /dev/null; do sleep 1; done
   }
+}
+
+# stop the server, then start the server
+# call with number to set as warning delay
+# call with additional text to use as warning message, defaults to BACKUP_WARNING_MESSAGE
+# call with additional text to use as kick message, defaults to BACKUP_KICK_MESSAGE
+function restart {
+  stop "$1" "${2:-$BACKUP_WARNING_MESSAGE}" "${3:-$BACKUP_KICK_MESSAGE}"
+  start
 }
 
 # make a backup of the world
@@ -99,6 +107,14 @@ function clean {
   sort -r |
   cut -d $'\n' -f $((BACKUP_AMOUNT + 1))- |
   xargs rm
+}
+
+# update the server.jar
+# call with URL to new server.jar
+function update {
+  stop
+  rm server.jar
+  wget -O server.jar $1
 }
 
 # -------------------------------- main --------------------------------
