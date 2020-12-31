@@ -1,34 +1,37 @@
 #!/bin/bash
 
 # usage: [path_to_script]/minecraft.bash [functions_to_run]
-# example: /srv/minecraft/minecraft.bash stop "backup 10"
+# example: /srv/minecraft/minecraft.bash "backup 10" start
+# explanation: stop the server and make a backup in 10 minutes, then start the server again
 
 # -------------------------------- settings --------------------------------
-
-# paths
-BACKUP_DIRECTORY="backup"
-WORLD_NAME="matigcraft" # level-name in server.properties
-
-# messages
-BACKUP_KICK_MESSAGE="The server is making a backup, and will be back online in a few minutes"
-BACKUP_WARNING_MESSAGE="The server will go offline to make a backup in X minute(s)"
-STOP_KICK_MESSAGE="The server is shutting down for maintenance"
-STOP_WARNING_MESSAGE="The server will go offline for maintenance in X minute(s)"
 
 # enable if you are using Bukkit, Spigot or Paper
 ALTERNATIVE_SERVER=true
 
-# clean automatically after a backup
+# clean old backups after making a backup
 AUTO_CLEAN=true
 
 # amount of backups to keep when cleaning
-BACKUP_AMOUNT=28
+BACKUP_AMOUNT=14
+
+# where to store the backups
+BACKUP_DIRECTORY="backup"
 
 # JVM arguments to use when starting the server
-JVM_ARGUMENTS="-Xms6G -Xmx6G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true"
+JVM_ARGUMENTS="-Xms4G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true"
 
 # log all screen content to $WORLD_NAME.log
 LOGGING=true
+
+# messages
+RESTART_KICK_MESSAGE="The server is restarting and making a backup, and will be back online in a few minutes"
+RESTART_WARNING_MESSAGE="The server will restart to make a backup in X minute(s)"
+STOP_KICK_MESSAGE="The server is shutting down for maintenance"
+STOP_WARNING_MESSAGE="The server will shut down for maintenance in X minute(s)"
+
+# has to be the same as level-name in server.properties
+WORLD_NAME="matigcraft"
 
 # -------------------------------- functions --------------------------------
 
@@ -74,19 +77,19 @@ function stop {
 
 # stop the server, then start the server
 # call with number to set as warning delay
-# call with additional text to use as warning message, defaults to BACKUP_WARNING_MESSAGE
-# call with additional text to use as kick message, defaults to BACKUP_KICK_MESSAGE
+# call with additional text to use as warning message, defaults to RESTART_WARNING_MESSAGE
+# call with additional text to use as kick message, defaults to RESTART_KICK_MESSAGE
 function restart {
-  stop "$1" "${2:-$BACKUP_WARNING_MESSAGE}" "${3:-$BACKUP_KICK_MESSAGE}"
+  stop "$1" "${2:-$RESTART_WARNING_MESSAGE}" "${3:-$RESTART_KICK_MESSAGE}"
   start
 }
 
 # make a backup of the world
 # call with number to set as warning delay
-# call with additional text to use as warning message, defaults to BACKUP_WARNING_MESSAGE
-# call with additional text to use as kick message, defaults to BACKUP_KICK_MESSAGE
+# call with additional text to use as warning message, defaults to RESTART_WARNING_MESSAGE
+# call with additional text to use as kick message, defaults to RESTART_KICK_MESSAGE
 function backup {
-  stop "$1" "${2:-$BACKUP_WARNING_MESSAGE}" "${3:-$BACKUP_KICK_MESSAGE}"
+  stop "$1" "${2:-$RESTART_WARNING_MESSAGE}" "${3:-$RESTART_KICK_MESSAGE}"
   $ALTERNATIVE_SERVER && convert
   mkdir -p "$BACKUP_DIRECTORY"
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
@@ -103,7 +106,7 @@ function convert {
 
 # clean old backups
 function clean {
-  find "$BACKUP_DIRECTORY"/"$WORLD_NAME"* |
+  find "$BACKUP_DIRECTORY"/"$WORLD_NAME"*.zip |
   sort -r |
   cut -d $'\n' -f $((BACKUP_AMOUNT + 1))- |
   xargs rm
