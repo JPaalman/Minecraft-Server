@@ -1,0 +1,14 @@
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+Type=simple
+KillMode=none
+RemainAfterExit=true
+
+ExecStart=/srv/minecraft/minecraft.bash start
+ExecStop=/srv/minecraft/minecraft.bash stop
+
+[Install]
+WantedBy=multi-user.target

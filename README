@@ -1,0 +1,19 @@
+A set of scripts and services for running and maintaining a minecraft server.
+
+Tested with Ubuntu Linux, but might work on other distro's as well. 
+You might need to install python3 if not included in order to use "update.bash"
+
+SETUP
+Install a Java runtime environment.
+Create a system user named "minecraft" with a home directory, ideally "/srv/minecraft".
+Place both scripts in the newly created home directory.
+You might want to configure both scripts before use, and explore the different functions in "minecraft.bash".
+Settings are found at the top of the scripts.
+Run "update.bash" to install the most recent PaperMC build, or manually download a minecraft server named "server.jar".
+Start the server using "minecraft.bash start"
+After the first run, you can configure the newly created setting files, such as "server.properties".
+To run the server at boot, you can install "minecraft.service" in systemd and enable it.
+You can also install "web.service" to allow players to download world backups.
+Lastly, you can make a crontab to schedule events, in my case daily backups, updates and reboots:
+
+50 5 * * * /srv/minecraft/minecraft.bash "backup 10" clean; /srv/minecraft/update.bash; /sbin/reboot;

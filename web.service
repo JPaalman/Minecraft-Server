@@ -1,0 +1,11 @@
+[Unit]
+Description=Web server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/minecraft/backup
+ExecStart=python3 -m http.server 80
+
+[Install]
+WantedBy=multi-user.target
