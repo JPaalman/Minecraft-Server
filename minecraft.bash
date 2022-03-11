@@ -6,9 +6,6 @@
 
 # -------------------------------- settings --------------------------------
 
-# enable if you are using Bukkit, Spigot or Paper
-ALTERNATIVE_SERVER=true
-
 # amount of backups to keep when cleaning
 BACKUP_AMOUNT=14
 
@@ -42,6 +39,7 @@ function status {
 # if not running, start the server in the background
 function start {
   status >/dev/null || {
+    convert_vanilla
     $LOGGING && {
       printf "\n\n" >>"$WORLD_NAME".log && date >>"$WORLD_NAME".log
       screen -L -Logfile "$WORLD_NAME".log -DmS "$WORLD_NAME" java $JVM_ARGUMENTS -jar server.jar nogui &
@@ -78,17 +76,33 @@ function stop {
 # call with additional text to use as kick message, defaults to BACKUP_KICK_MESSAGE
 function backup {
   stop "$1" "${2:-$BACKUP_WARNING_MESSAGE}" "${3:-$BACKUP_KICK_MESSAGE}"
-  $ALTERNATIVE_SERVER && convert
+  convert_alternative
   mkdir -p "$BACKUP_DIRECTORY"
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
 }
 
-# convert Bukkit, Spigot and Paper worlds back to vanilla format
-function convert {
-  mv "$WORLD_NAME"_nether/DIM-1 "$WORLD_NAME"/DIM-1
-  mv "$WORLD_NAME"_the_end/DIM1 "$WORLD_NAME"/DIM1
-  rm -rf "$WORLD_NAME"_nether
-  rm -rf "$WORLD_NAME"_the_end
+# convert vanilla worlds to Bukkit, Spigot, Paper and similar server format
+function convert_vanilla {
+  [ -d "$WORLD_NAME"/"$WORLD_NAME"_nether ] && {
+    mv "$WORLD_NAME"/"$WORLD_NAME"_nether ./
+    mv "$WORLD_NAME"/DIM-1 "$WORLD_NAME"_nether
+  }
+  [ -d "$WORLD_NAME"/"$WORLD_NAME"_the_end ] && {
+    mv "$WORLD_NAME"/"$WORLD_NAME"_the_end ./
+    mv "$WORLD_NAME"/DIM1 "$WORLD_NAME"_the_end
+  }
+}
+
+# convert Bukkit, Spigot, Paper and similar server worlds back to vanilla format
+function convert_alternative {
+  [ -d "$WORLD_NAME"_nether ] && {
+    mv "$WORLD_NAME"_nether/DIM-1 "$WORLD_NAME"
+    mv "$WORLD_NAME"_nether "$WORLD_NAME"
+  }
+  [ -d "$WORLD_NAME"_the_end ] && {
+    mv "$WORLD_NAME"_the_end/DIM1 "$WORLD_NAME"
+    mv "$WORLD_NAME"_the_end "$WORLD_NAME"
+  }
 }
 
 # clean old backups
