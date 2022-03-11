@@ -81,18 +81,6 @@ function backup {
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
 }
 
-# convert vanilla worlds to Bukkit, Spigot, Paper and similar server format
-function convert_vanilla {
-  [ -d "$WORLD_NAME"/"$WORLD_NAME"_nether ] && {
-    mv "$WORLD_NAME"/"$WORLD_NAME"_nether ./
-    mv "$WORLD_NAME"/DIM-1 "$WORLD_NAME"_nether
-  }
-  [ -d "$WORLD_NAME"/"$WORLD_NAME"_the_end ] && {
-    mv "$WORLD_NAME"/"$WORLD_NAME"_the_end ./
-    mv "$WORLD_NAME"/DIM1 "$WORLD_NAME"_the_end
-  }
-}
-
 # convert Bukkit, Spigot, Paper and similar server worlds back to vanilla format
 function convert_alternative {
   [ -d "$WORLD_NAME"_nether ] && {
@@ -102,6 +90,18 @@ function convert_alternative {
   [ -d "$WORLD_NAME"_the_end ] && {
     mv "$WORLD_NAME"_the_end/DIM1 "$WORLD_NAME"
     mv "$WORLD_NAME"_the_end "$WORLD_NAME"
+  }
+}
+
+# restore converted vanilla worlds to Bukkit, Spigot, Paper and similar server format
+function convert_vanilla {
+  [ -d "$WORLD_NAME"/"$WORLD_NAME"_nether ] && {
+    mv "$WORLD_NAME"/"$WORLD_NAME"_nether ./
+    mv "$WORLD_NAME"/DIM-1 "$WORLD_NAME"_nether
+  }
+  [ -d "$WORLD_NAME"/"$WORLD_NAME"_the_end ] && {
+    mv "$WORLD_NAME"/"$WORLD_NAME"_the_end ./
+    mv "$WORLD_NAME"/DIM1 "$WORLD_NAME"_the_end
   }
 }
 
