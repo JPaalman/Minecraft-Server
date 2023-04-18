@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # usage: [path_to_script]/minecraft.bash [functions_to_run]
-# example: /srv/minecraft/minecraft.bash "backup 10" start
-# explanation: stop the server and make a backup in 10 minutes, then start the server again
+
+# example: /srv/minecraft/minecraft.bash backup start console
+# explanation: stop the server, make a backup, then start the server again and open the console
+
+# example: /srv/minecraft/minecraft.bash "say Hello everyone!"
+# explanation: send the message "Hello everyone!" to the server chat
 
 # -------------------------------- settings --------------------------------
 
@@ -77,14 +81,14 @@ function console {
   screen -d -r "$WORLD_NAME"
 }
 
-# if running, send a chat message
+# if running, send a chat message to the server
 # call with message
-function message {
+function say {
    status >/dev/null && screen -S "$WORLD_NAME" -X stuff "say $1"
 }
 
 # if running, stop the server and wait
-# call with additional text to use as kick message, defaults to STOP_MESSAGE
+# call with kick message, defaults to STOP_MESSAGE
 function stop {
   status >/dev/null && {
     screen -S "$WORLD_NAME" -X stuff "kick @a ${1:-$STOP_MESSAGE}\n""stop\n"
@@ -93,7 +97,7 @@ function stop {
 }
 
 # make a backup of the world
-# call with additional text to use as kick message, defaults to BACKUP_MESSAGE
+# call with kick message, defaults to BACKUP_MESSAGE
 function backup {
   stop "${1:-$BACKUP_KICK_MESSAGE}"
   convert_vanilla
