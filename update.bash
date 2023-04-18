@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PAPER_VERSION=1.18.2
+PAPER_VERSION=1.19.4
 
 [ "$USER" == minecraft ] || {
   sudo -u minecraft "$0"
