@@ -16,5 +16,5 @@ To run the server at boot, you can install "minecraft.service" in systemd and en
 You can also install "web.service" to allow players to download world backups.
 Lastly, you can make a crontab to schedule events, in my case daily backups, updates and reboots:
 
-50  5   *   *   *   /srv/minecraft/minecraft.bash "say The server will restart to make a backup in 10 minutes"
-00  6   *   *   *   /srv/minecraft/minecraft.bash backup; /srv/minecraft/update.bash; /sbin/reboot;
+50 5 * * * /srv/minecraft/minecraft.bash "say The server will restart to make a backup in 10 minutes"
+00 6 * * * /srv/minecraft/minecraft.bash backup; /srv/minecraft/update.bash; /sbin/reboot;
