@@ -6,7 +6,8 @@
 
 # -------------------------------- settings --------------------------------
 
-# amount of backups to keep when cleaning
+# amount of backups to keep before removing old ones
+# set to 0 to keep all backups
 BACKUP_AMOUNT=14
 
 # where to store the backups
@@ -98,14 +99,14 @@ function backup {
   convert_vanilla
   mkdir -p "$BACKUP_DIRECTORY"
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
-}
-
-# clean old backups
-function clean {
-  find "$BACKUP_DIRECTORY"/"$WORLD_NAME"_*.zip |
+  
+  # if $BACKUP_AMOUNT is larger than 0, attempt to clean old backups
+  (("$BACKUP_AMOUNT" > 0)) || {
+    find "$BACKUP_DIRECTORY"/"$WORLD_NAME"_*.zip |
     sort -r |
     cut -d $'\n' -f $((BACKUP_AMOUNT + 1))- |
     xargs rm
+  }
 }
 
 # -------------------------------- main --------------------------------
