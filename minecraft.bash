@@ -84,7 +84,7 @@ function console {
 # if running, send a chat message to the server
 # call with message
 function say {
-   status >/dev/null && screen -S "$WORLD_NAME" -X stuff "say $1"
+   status >/dev/null && screen -S "$WORLD_NAME" -X stuff "say $@"
 }
 
 # if running, stop the server and wait
