@@ -99,7 +99,7 @@ function stop {
 # make a backup of the world
 # call with kick message, defaults to BACKUP_MESSAGE
 function backup {
-  stop "${1:-$BACKUP_KICK_MESSAGE}"
+  stop "${1:-$BACKUP_MESSAGE}"
   convert_vanilla
   mkdir -p "$BACKUP_DIRECTORY"
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
