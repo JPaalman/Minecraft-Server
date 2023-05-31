@@ -105,7 +105,7 @@ function backup {
   zip -9 -r "$BACKUP_DIRECTORY"/"$WORLD_NAME"_"$(date +%Y_%m_%d_%H%M)".zip "$WORLD_NAME"
   
   # if $BACKUP_AMOUNT is larger than 0, attempt to clean old backups
-  (("$BACKUP_AMOUNT" > 0)) || {
+  (("$BACKUP_AMOUNT" > 0)) && {
     find "$BACKUP_DIRECTORY"/"$WORLD_NAME"_*.zip |
     sort -r |
     cut -d $'\n' -f $((BACKUP_AMOUNT + 1))- |
